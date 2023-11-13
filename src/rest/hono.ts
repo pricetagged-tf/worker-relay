@@ -1,4 +1,6 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+import { prettyJSON } from 'hono/pretty-json'
 import { HTTPException } from 'hono/http-exception'
 
 import type { Environment } from '../env'
@@ -7,6 +9,13 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 
 const honoApp = new Hono<{ Bindings: Environment }>()
+
+honoApp.use(
+  '*',
+  cors({
+    origin: ['https://loadout.tf/'],
+  })
+)
 
 const getPricingsSchema = zValidator(
   'query',
