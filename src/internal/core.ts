@@ -1,5 +1,31 @@
 import { KVKeys } from './types'
 
+export async function getPricingsGrouped(options: {
+  host: string
+  kv: KVNamespace
+  refresh?: boolean
+  cache?: boolean
+}): Promise<unknown> {
+  console.debug('fetching')
+  const { host, kv, refresh = false, cache = true } = options
+  if (!refresh) {
+    const cached = await getFromKV(kv, 'pricings-autobot-grouped')
+    if (cached) {
+      return cached
+    }
+  }
+  const res = await fetch(
+    host + '/pricings/group?source=autobot.tf&refresh=' + refresh
+  )
+
+  const result = await res.json()
+  console.debug(result)
+  if (cache) {
+    await saveToKV(kv, 'pricings-autobot-grouped', result)
+  }
+  return result
+}
+
 export async function getPricings(options: {
   host: string
   kv: KVNamespace

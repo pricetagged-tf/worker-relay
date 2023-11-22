@@ -3,4 +3,4 @@ export enum PriceSource {
   BACKPACK = 'backpack.tf',
 }
 
-export type KVKeys = 'pricings-autobot'
+export type KVKeys = 'pricings-autobot' | 'pricings-autobot-grouped'

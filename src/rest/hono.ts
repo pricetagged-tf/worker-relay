@@ -4,7 +4,7 @@ import { prettyJSON } from 'hono/pretty-json'
 import { HTTPException } from 'hono/http-exception'
 
 import type { Environment } from '../env'
-import { getFromKV, getPricings } from '../internal/core'
+import { getFromKV, getPricings, getPricingsGrouped } from '../internal/core'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 
@@ -25,20 +25,42 @@ const getPricingsSchema = zValidator(
 )
 
 honoApp.get('/pricings', getPricingsSchema, async (c) => {
-  const getShorthand = async () =>
+  console.debug('pricings')
+  const fetchFromSource = async () =>
     getPricings({
       cache: true,
       host: c.env.PRICINGS_SERVICE_URL,
       kv: c.env.PRICINGS_KV,
-      refresh: true,
+      refresh: c.req.query().refresh === 'true',
     })
   try {
     const results = !c.req.query().refresh
       ? await getFromKV(c.env.PRICINGS_KV, 'pricings-autobot')
-      : await getShorthand()
-    return c.json(results ?? (await getShorthand()))
+      : await fetchFromSource()
+    return c.json(results ?? (await fetchFromSource()))
   } catch (e) {
-    console.log(e)
+    console.error(e)
+    throw new HTTPException(503, {
+      message: 'Service Unavailable',
+    })
+  }
+})
+
+honoApp.get('/pricings/group', getPricingsSchema, async (c) => {
+  const fetchFromSource = async () =>
+    getPricingsGrouped({
+      cache: true,
+      host: c.env.PRICINGS_SERVICE_URL,
+      kv: c.env.PRICINGS_KV,
+      refresh: c.req.query().refresh === 'true',
+    })
+  try {
+    const results = !c.req.query().refresh
+      ? await getFromKV(c.env.PRICINGS_KV, 'pricings-autobot-grouped')
+      : await fetchFromSource()
+    return c.json(results ?? (await fetchFromSource()))
+  } catch (e) {
+    console.error(e)
     throw new HTTPException(503, {
       message: 'Service Unavailable',
     })
