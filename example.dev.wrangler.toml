@@ -1,0 +1,8 @@
+main = "./src/index.ts"
+name = "worker-relay"
+compatibility_date = "2022-07-26"
+
+kv_namespaces = [{ binding = "PRICINGS_KV", id = "<DEV_KV_ID>" }]
+
+[triggers]
+crons = ["*/9 * * * *"]
