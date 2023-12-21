@@ -9,3 +9,4 @@ crons = ["*/9 * * * *"]
 
 [vars]
 PRICINGS_SERVICE_URL = "https://pricings-service.example.com"
+NODE_ENV = "production"

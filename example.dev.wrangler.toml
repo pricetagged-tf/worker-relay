@@ -6,3 +6,6 @@ kv_namespaces = [{ binding = "PRICINGS_KV", id = "<DEV_KV_ID>" }]
 
 [triggers]
 crons = ["*/9 * * * *"]
+
+[vars]
+NODE_ENV = "development"
