@@ -10,18 +10,12 @@ import { z } from 'zod'
 
 const honoApp = new Hono<{ Bindings: Environment }>()
 
-honoApp.use('*', async (c, next) => {
-  const env = c.env.NODE_ENV ?? 'development'
-
-  const origin = ['https://loadout.tf']
-  if (env === 'development') {
-    origin.push('http://localhost:6006')
-  }
+honoApp.use(
+  '*',
   cors({
-    origin,
+    origin: ['https://loadout.tf', 'http://localhost:6006'],
   })
-  await next()
-})
+)
 
 const getPricingsSchema = zValidator(
   'query',
